@@ -8,4 +8,6 @@ response variables are: MaxAreaLowIntensityBloom	MaxAreaModerateIntensityBloom	M
 
 # running jupyter
     
+    git clone ...
+    cd ignatius_reservoirs
     jupyter lab
