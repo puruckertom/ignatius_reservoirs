@@ -5,3 +5,7 @@
 response variables are: MaxAreaLowIntensityBloom	MaxAreaModerateIntensityBloom	MaxAreaHighIntensityBloom	MaxCyanConcentration	Freq
 
 -raw_708reservoir_timeseries.xlxs is weekly output for the 708 reservoirs. We flagged snow/ice dates using GEE.
+
+# running jupyter
+    
+    jupyter lab
