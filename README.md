@@ -9,6 +9,6 @@ response variables are: MaxAreaLowIntensityBloom	MaxAreaModerateIntensityBloom	M
 # running jupyter
     
     # anaconda installs jupyter by default
-    git clone ...
+    git clone https://github.com/puruckertom/ignatius_reservoirs.git
     cd ignatius_reservoirs
     jupyter lab
