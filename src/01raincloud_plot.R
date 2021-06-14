@@ -94,6 +94,7 @@ spring_raincloud_1_h <- raincloud_1x1(
   scale_x_continuous(breaks=c(1.3,2.3), 
                      labels=c(paste("Headwaters\n n=",n_hw_spring), paste("Near Dam\n n=",n_nd_spring)), 
                      limits=c(0.9, 3)) +
+  scale_y_continuous(breaks = NULL) +
   xlab("") + 
   ylab("") +
   theme_classic() +
@@ -178,9 +179,8 @@ winter_raincloud_1_h <- raincloud_1x1(
   scale_x_continuous(breaks=c(1.3,2.3), 
                      labels=c(paste("Headwaters\n n=",n_hw_winter), paste("Near Dam\n n=",n_nd_winter)),
                      limits=c(0.9, 3)) +
-  scale_y_continuous(breaks = NULL) +
   xlab("") + 
-  ylab("Normalized Bloom Pixel Proportion") +
+  ylab("Bloom Pixel Percentiles") +
   theme_classic() +
   annotate(geom='text', x=3.0, y=0.05, label="Winter", fontface="bold")
 winter_raincloud_1_h
