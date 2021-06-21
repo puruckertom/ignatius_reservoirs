@@ -10,8 +10,9 @@ library(remotes)
 library(rstatix)
 library(schoolmath)
 library(chron)
+library(tidyverse)
 
-remotes::install_github('jorvlan/raincloudplots')
+#remotes::install_github('jorvlan/raincloudplots')
 
 library(raincloudplots)
 
@@ -38,17 +39,36 @@ dim(ari_pixels)
 summary(ari_pixels)
 colnames(ari_pixels)
 #View(ari_pixels)
-p50_list <- which(grepl("_p50",colnames(ari50)))
-#not sure why this fails
+
+#pull out reservoir and location as factor
+ari_factors <- ari_pixels[,c(1:2)]
+ari_factors$Reservoir <- as.factor(ari_factors$Reservoir)
+ari_factors$DamLocation <- as.factor(ari_factors$DamLocation)
+
+# create 50th percentiles
+p50_list <- which(grepl("_p50",colnames(ari_pixels)))
 length(p50_list)
-colnames(ari_pixels[,p50_list])
-p50_list2 <- seq(from=6, to=9112, by=5)
-p50_list3 = p50_list2[-1]
-length(p50_list3)
-#use this instead
-#View(colnames(ari_pixels[,p50_list3]))
-ari50 <- ari_pixels[,c(1:2,p50_list3)]
-ari50$Reservoir <- as.factor(ari50$Reservoir)
-ari50$DamLocation <- as.factor(ari50$DamLocation)
+head(colnames(ari_pixels[,p50_list]))
+p50_values <- ari_pixels %>% select(all_of(p50_list))
+dim(p50_values)
+#View(p50_values)
+p50_concs <- 10^(3.0 / 250.0 * p50_values - 4.2) * 1.0e+8
+#View(p50_concs)
+ari50 <- cbind(ari_factors, p50_concs)
 dim(ari50)
-colnames(ari50)
+head(colnames(ari50))
+
+# create 75th percentiles
+p75_list <- which(grepl("_p75",colnames(ari_pixels)))
+length(p75_list)
+head(colnames(ari_pixels[,p75_list]))
+p75_values <- ari_pixels %>% select(all_of(p75_list))
+dim(p75_values)
+max(p75_values, na.rm=T)
+#View(p75_values)
+p75_concs <- 10^(3.0 / 250.0 * p75_values - 4.2) * 1.0e+8
+#View(p75_concs)
+max(p75_concs, na.rm=T)
+ari75 <- cbind(ari_factors, p75_concs)
+dim(ari75)
+head(colnames(ari75))

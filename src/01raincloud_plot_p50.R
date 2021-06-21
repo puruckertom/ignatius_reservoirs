@@ -178,8 +178,9 @@ winter_raincloud_1_h <- raincloud_1x1(
   scale_x_continuous(breaks=c(1.3,2.3), 
                      labels=c(paste("Headwaters\n n=",n_hw_winter), paste("Near Dam\n n=",n_nd_winter)),
                      limits=c(0.9, 3)) +
+  scale_y_continuous(breaks = NULL) +
   xlab("") + 
-  ylab("Bloom Pixel Percentiles") +
+  ylab("Cyanobacteria concentration (cells/ml) ") +
   theme_classic() +
   annotate(geom='text', x=3.0, y=0.05, label="Winter", fontface="bold")
 winter_raincloud_1_h
@@ -206,7 +207,7 @@ grid.arrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, win
 
 
 # combined figure 
-ignatius_all_season_jpg <- paste(ari_graphics,"/ari_all_seasons.jpg",sep="")
+ignatius_all_season_jpg <- paste(ari_graphics,"/ari_all_seasons_p50.jpg",sep="")
 jpeg(ignatius_all_season_jpg, width = 5, height = 8, units = "in",res=600)
 par(mfrow=c(1,1))
   ggarrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, winter_raincloud_1_h,

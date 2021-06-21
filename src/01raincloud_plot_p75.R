@@ -1,13 +1,13 @@
-dim(ari50)
+dim(ari75)
 
-ndays <- ncol(ari50)-2
-col_strings <- colnames(ari50[3:ndays+2])
+ndays <- ncol(ari75)-2
+col_strings <- colnames(ari75[3:ndays+2])
 year <- substr(col_strings,2,5)
 day <- substr(col_strings,6,8)
 sample_date <- as.Date(paste(day,year), format="%j %Y")
 head(sample_date)
 sample_season <- factor(quarters(as.chron(sample_date)), 
-                    labels = c("winter", "spring", "summer", "fall"))
+                        labels = c("winter", "spring", "summer", "fall"))
 head(sample_season)
 cbind(sample_season, sample_date)
 
@@ -15,10 +15,10 @@ cbind(sample_season, sample_date)
 headwaters <- vector()
 neardam <- vector()
 season <- vector()
-for(i in 1:nrow(ari50)){
+for(i in 1:nrow(ari75)){
   if(is.odd(i)){ # Headwaters, NearDam repeating
     #grab the data for this reservoir
-    reservoir_temp <- as.matrix(ari50[i:(i+1),3:ndays+2])
+    reservoir_temp <- as.matrix(ari75[i:(i+1),3:ndays+2])
     colnames(reservoir_temp) <- NULL
     #extract all
     headwaters_temp <- reservoir_temp[1,]
@@ -178,6 +178,7 @@ winter_raincloud_1_h <- raincloud_1x1(
   scale_x_continuous(breaks=c(1.3,2.3), 
                      labels=c(paste("Headwaters\n n=",n_hw_winter), paste("Near Dam\n n=",n_nd_winter)),
                      limits=c(0.9, 3)) +
+  scale_y_continuous(breaks = NULL) +
   xlab("") + 
   ylab("Bloom Pixel Percentiles") +
   theme_classic() +
@@ -187,7 +188,7 @@ winter_raincloud_1_h
 ignatius_winter_jpg <- paste(ari_graphics,"/ari_winter.jpg",sep="")
 jpeg(ignatius_winter_jpg, width = 8, height = 4, units = "in",res=600)
 par(mfrow=c(1,1))
-  winter_raincloud_1_h
+winter_raincloud_1_h
 dev.off()
 
 ###Multiplot choices
@@ -206,9 +207,9 @@ grid.arrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, win
 
 
 # combined figure 
-ignatius_all_season_jpg <- paste(ari_graphics,"/ari_all_seasons.jpg",sep="")
+ignatius_all_season_jpg <- paste(ari_graphics,"/ari_all_seasons_p75.jpg",sep="")
 jpeg(ignatius_all_season_jpg, width = 5, height = 8, units = "in",res=600)
 par(mfrow=c(1,1))
-  ggarrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, winter_raincloud_1_h,
-            ncol = 1, nrow = 4)
+ggarrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, winter_raincloud_1_h,
+          ncol = 1, nrow = 4)
 dev.off()
