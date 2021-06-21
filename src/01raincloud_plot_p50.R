@@ -180,7 +180,7 @@ winter_raincloud_1_h <- raincloud_1x1(
                      limits=c(0.9, 3)) +
   scale_y_continuous(breaks = NULL) +
   xlab("") + 
-  ylab("Cyanobacteria concentration (cells/ml) ") +
+  ylab("Cyanobacteria concentration (cells/ml)") +
   theme_classic() +
   annotate(geom='text', x=3.0, y=0.05, label="Winter", fontface="bold")
 winter_raincloud_1_h

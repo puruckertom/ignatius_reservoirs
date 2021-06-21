@@ -15,13 +15,20 @@ cbind(sample_season, sample_date)
 headwaters <- vector()
 neardam <- vector()
 season <- vector()
+#create storage vectors for p-value resutls
+location_sig <- vector(mode="character", length=60)
+pvalue <- vector(mode="numeric", length=60)
 # non-parameteric wilcoxon signed rank test for paired samples
 # https://www.datanovia.com/en/lessons/wilcoxon-test-in-r/#signed-rank-test-on-paired-samples
+counter <- 0
 for(i in 1:nrow(ari50)){
   if(is.odd(i)){ # Headwaters, NearDam repeating
+    counter <- counter + 1
+    as.character(ari50[i,1])
     #grab the data for this reservoir
     reservoir_temp <- as.matrix(ari50[i:(i+1),3:ndays+2])
     colnames(reservoir_temp) <- NULL
+    location_sig[counter] <- as.character(ari50[i,1])
     #extract all
     headwaters_temp <- reservoir_temp[1,]
     neardam_temp <- reservoir_temp[2,]
@@ -46,12 +53,13 @@ for(i in 1:nrow(ari50)){
     #summary(bloom_compare)
     #wsr test
     hw_nd_test <- wilcox.test(x=headwaters_kept, y=neardam_kept,
-                              alternative = "two.sided",
+                              alternative = "greater",
                               mu = 0, paired = TRUE, exact = NULL, correct = TRUE,
                               conf.int = FALSE, conf.level = 0.95)
     reservoir_name <- as.character(ari50$Reservoir[i])
     print(hw_nd_test)
     p_value_text <- paste("p=", signif(hw_nd_test$p.value,4))
+    pvalue[counter] <- signif(hw_nd_test$p.value,4)
     #boxplot
     bxp <- ggboxplot(bloom_compare, x = "location", y = "concentration",  
               color = "location", palette = c("#00AFBB", "#E7B800"),
@@ -62,3 +70,9 @@ for(i in 1:nrow(ari50)){
     bxp
   }
 }
+
+location_pvalues <- cbind(location_sig, pvalue)
+#View(location_pvalues)
+sum(pvalue>0.05)
+
+write.csv(location_pvalues, paste(ari_data_out, "/location_pvalues.csv", sep=""))

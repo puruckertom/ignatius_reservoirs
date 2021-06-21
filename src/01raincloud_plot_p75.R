@@ -178,17 +178,17 @@ winter_raincloud_1_h <- raincloud_1x1(
   scale_x_continuous(breaks=c(1.3,2.3), 
                      labels=c(paste("Headwaters\n n=",n_hw_winter), paste("Near Dam\n n=",n_nd_winter)),
                      limits=c(0.9, 3)) +
-  scale_y_continuous(breaks = NULL) +
+  #scale_y_continuous(breaks = NULL) +
   xlab("") + 
-  ylab("Bloom Pixel Percentiles") +
+  #ylab("Cyanobacteria concentration (cells/ml)") +
   theme_classic() +
   annotate(geom='text', x=3.0, y=0.05, label="Winter", fontface="bold")
 winter_raincloud_1_h
 
-ignatius_winter_jpg <- paste(ari_graphics,"/ari_winter.jpg",sep="")
+ignatius_winter_jpg <- paste(ari_graphics,"/ari_winter_p75.jpg",sep="")
 jpeg(ignatius_winter_jpg, width = 8, height = 4, units = "in",res=600)
-par(mfrow=c(1,1))
-winter_raincloud_1_h
+  par(mfrow=c(1,1))
+  winter_raincloud_1_h
 dev.off()
 
 ###Multiplot choices
