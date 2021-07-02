@@ -11,7 +11,8 @@ library(rstatix)
 library(schoolmath)
 library(chron)
 library(tidyverse)
-
+library(patchwork)
+library(forecast)
 #remotes::install_github('jorvlan/raincloudplots')
 
 library(raincloudplots)

@@ -37,23 +37,22 @@ for(i in 1:nrow(ari50)){
       }else if(j==2){
         extract_cols <- summer_cols
         this_season <- 'summer'        
-      }
       }else if(j==3){
         extract_cols <- fall_cols
         this_season <- 'fall'        
-      }
-      }else if(j==4){
+      }else{
         extract_cols <- winter_cols
         this_season <- 'winter'        
       }
-      as.character(ari50[i,1])
+      season_sig[counter] <- this_season
+      this_reservoir <- as.character(ari50[i,1])
+      location_sig[counter] <- this_reservoir
       #grab the data for this reservoir
       reservoir_temp <- as.matrix(ari50[i:(i+1),3:ndays+2])
-      View(reservoir_temp)
+      #View(reservoir_temp)
       #grab the data for this season in this reservoir
-      reservoir_temp <- reservoir_temp
+      reservoir_temp <- reservoir_temp[,extract_cols]
       colnames(reservoir_temp) <- NULL
-      location_sig[counter] <- as.character(ari50[i,1])
       #extract all
       headwaters_temp <- reservoir_temp[1,]
       neardam_temp <- reservoir_temp[2,]
@@ -82,14 +81,14 @@ for(i in 1:nrow(ari50)){
                                 mu = 0, paired = TRUE, exact = NULL, correct = TRUE,
                                 conf.int = FALSE, conf.level = 0.95)
       reservoir_name <- as.character(ari50$Reservoir[i])
-      print(hw_nd_test)
       p_value_text <- paste("p=", signif(hw_nd_test$p.value,4))
       pvalue[counter] <- signif(hw_nd_test$p.value,4)
+      print(paste(this_reservoir, this_season, p_value_text))
       #boxplot
       bxp <- ggboxplot(bloom_compare, x = "location", y = "concentration",  
                        color = "location", palette = c("#00AFBB", "#E7B800"),
                        order = c("headwaters", "neardam"),
-                       title= reservoir_name,
+                       title= paste(reservoir_name, ":", this_season),
                        ylab = "Conc", xlab = p_value_text) + 
         theme(legend.position = "none")
       bxp
@@ -97,7 +96,7 @@ for(i in 1:nrow(ari50)){
   }
 }
 
-location_pvalues <- cbind(location_sig, pvalue)
+location_pvalues <- cbind(location_sig, season_sig, pvalue)
 #View(location_pvalues)
 sum(pvalue>0.05)
 
