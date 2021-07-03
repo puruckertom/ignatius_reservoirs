@@ -13,6 +13,8 @@ library(chron)
 library(tidyverse)
 library(patchwork)
 library(forecast)
+library(clusrank)
+library(move)
 #remotes::install_github('jorvlan/raincloudplots')
 
 library(raincloudplots)
@@ -43,6 +45,7 @@ colnames(ari_pixels)
 
 #pull out reservoir and location as factor
 ari_factors <- ari_pixels[,c(1:2)]
+dim(ari_factors)
 ari_factors$Reservoir <- as.factor(ari_factors$Reservoir)
 ari_factors$DamLocation <- as.factor(ari_factors$DamLocation)
 
@@ -55,9 +58,24 @@ dim(p50_values)
 #View(p50_values)
 p50_concs <- 10^(3.0 / 250.0 * p50_values - 4.2) * 1.0e+8
 #View(p50_concs)
+
 ari50 <- cbind(ari_factors, p50_concs)
 dim(ari50)
 head(colnames(ari50))
+
+#non-detects for converting into proxy value, can screw up acfs so wait
+#these will be used inside loop later
+ari_legit_nds <- read.csv(file.path(ari_data_in,"/legit_nds_by_lake.csv"), stringsAsFactors = TRUE)
+dim(ari_legit_nds)
+summary(ari_legit_nds)
+colnames(ari_legit_nds)
+
+#import cloud cover NAs from Amber and reassign as NAs to drop later for testing
+#these will be used inside loop later
+ari_legit_NAs <- read.csv(file.path(ari_data_in,"/legit_NAs_by_lake.csv"), stringsAsFactors = TRUE)
+dim(ari_legit_NAs)
+summary(ari_legit_NAs)
+colnames(ari_legit_NAs)
 
 # create 75th percentiles
 p75_list <- which(grepl("_p75",colnames(ari_pixels)))

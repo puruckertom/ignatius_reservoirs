@@ -17,6 +17,7 @@ cbind(sample_season, sample_date)
 headwaters <- vector()
 neardam <- vector()
 season <- vector()
+lakes <- vector()
 #create storage vectors for p-value resutls
 location_sig <- vector(mode="character", length=60)
 pvalue <- vector(mode="numeric", length=60)
@@ -42,7 +43,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
       #extract all
       headwaters_temp <- reservoir_temp[1,]
       neardam_temp <- reservoir_temp[2,]
-      #find those not NA
+      #find those not NA (and not zero)
       keepers_headwaters <- which(!is.na(headwaters_temp))
       keepers_neardam <- which(!is.na(neardam_temp))
       #ID those where headwater OR neardam not NA
@@ -73,20 +74,25 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
       ####
       #build a dataframe for the entire time series
       n_length <- length(headwaters_kept)
+      reservoir_name <- as.character(ari50$Reservoir[i])
       bloom_compare <- data.frame(
                           cbind(
                           concentration = c(headwaters_kept, neardam_kept), 
                           seasons = c(seasons_kept, seasons_kept),
-                          location = rep(c("headwaters", "neardam"), each = n_length)))
+                          location = rep(c("headwaters", "neardam"), each = n_length),
+                          lake = rep(reservoir_name, n_length*2)))
       bloom_compare$concentration <- as.numeric(bloom_compare$concentration)
       bloom_compare$location <- as.factor(bloom_compare$location)
+      
+      #thin to weekly with move
+      
+      
       #summary(bloom_compare)
       #wsr test for all
       hw_nd_test <- wilcox.test(x=headwaters_kept, y=neardam_kept,
                                 alternative = "greater",
                                 mu = 0, paired = TRUE, exact = NULL, correct = TRUE,
                                 conf.int = FALSE, conf.level = 0.95)
-      reservoir_name <- as.character(ari50$Reservoir[i])
       print(hw_nd_test)
       p_value_text <- paste("p=", signif(hw_nd_test$p.value,4))
       pvalue[counter] <- signif(hw_nd_test$p.value,4)
@@ -234,6 +240,13 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
       #(acf_headwaters | acf_neardam)
       plots_combined <-  (bxp | (acf_headwaters / acf_neardam)) / (bxp_spring | bxp_summer | bxp_fall | bxp_winter)
       plot(plots_combined)
+      
+      # progressively build a large output file of the data used across all lakes
+      if(counter==1){
+        bloom_compare_all <- bloom_compare
+      } else {
+        bloom_compare_all <- rbind(bloom_compare_all, bloom_compare)
+      }
     }
   }
 dev.off()
@@ -247,3 +260,5 @@ sum(pvalue_fall>0.05)
 sum(pvalue_winter>0.05)
 
 write.csv(location_pvalues, paste(ari_data_out, "/location_pvalues.csv", sep=""))
+
+write.csv(bloom_compare_all, paste(ari_data_out, "/bloom_compare_all.csv", sep=""))
