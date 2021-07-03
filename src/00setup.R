@@ -69,13 +69,19 @@ ari_legit_nds <- read.csv(file.path(ari_data_in,"/legit_nds_by_lake.csv"), strin
 dim(ari_legit_nds)
 summary(ari_legit_nds)
 colnames(ari_legit_nds)
+View(ari_legit_nds) #actual NDs are zero in this file, the rest are either detected or NA
 
 #import cloud cover NAs from Amber and reassign as NAs to drop later for testing
 #these will be used inside loop later
+#this is tricky because NAs are NAs below and other values are blank, R explicitly
+#converted blanks to NaNs to differentiate
 ari_legit_NAs <- read.csv(file.path(ari_data_in,"/legit_NAs_by_lake.csv"), stringsAsFactors = TRUE)
 dim(ari_legit_NAs)
 summary(ari_legit_NAs)
 colnames(ari_legit_NAs)
+View(ari_legit_NAs)
+ari_legit_NAs[56,13] #NA
+ari_legit_NAs[56,14] #NaN
 
 # create 75th percentiles
 p75_list <- which(grepl("_p75",colnames(ari_pixels)))
