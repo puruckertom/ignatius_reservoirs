@@ -12,12 +12,14 @@ sample_season <- factor(quarters(as.chron(sample_date)),
                         labels = c("winter", "spring", "summer", "fall"))
 head(sample_season)
 cbind(sample_season, sample_date)
+length(sample_season)
 
 #create long vectors for comparison, drop observation when both are NAs
 headwaters <- vector()
 neardam <- vector()
 season <- vector()
 lakes <- vector()
+
 #create storage vectors for p-value resutls
 location_sig <- vector(mode="character", length=60)
 pvalue <- vector(mode="numeric", length=60)
@@ -28,49 +30,95 @@ pvalue_winter <- vector(mode="numeric", length=60)
 # non-parameteric wilcoxon signed rank test for paired samples
 # https://www.datanovia.com/en/lessons/wilcoxon-test-in-r/#signed-rank-test-on-paired-samples
 
-ari_wsr_test_filename <- paste(ari_graphics,"/ari_wsr_lakes.pdf",sep="")
+ari_wsr_test_filename <- paste(ari_graphics,"/ari_wsr_lakes_nocloudcoverobs.pdf",sep="")
 pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
   counter <- 0
   for(i in 1:nrow(ari50)){
     if(is.odd(i)){ # Headwaters, NearDam repeating
       counter <- counter + 1
-      as.character(ari50[i,1])
+      
+      ##### extract data for the ith lake
+      #save and print lake name
+      location_sig[counter] <- as.character(ari50[i,1])
+      print(location_sig[counter])
       #grab the data for this reservoir
       reservoir_temp <- as.matrix(ari50[i:(i+1),3:ndays+2])
       colnames(reservoir_temp) <- NULL
-      location_sig[counter] <- as.character(ari50[i,1])
-      print(location_sig[counter])
-      #extract all
+      #and separately extract for headwaters and neardam
       headwaters_temp <- reservoir_temp[1,]
       neardam_temp <- reservoir_temp[2,]
-      #find those not NA (and not zero)
+      print(paste("we start with", length(headwaters_temp), "daily observations"))
+      
+      ##### amber separately resolved whether nondetects were real non-detects or not observed
+      #grab the NAs for this reservoir (cloud cover)
+      reservoir_cloudcover_temp <- as.matrix(ari_legit_NAs[i:(i+1),3:ndays+2])
+      colnames(reservoir_cloudcover_temp) <- NULL
+      #and separately extract for headwaters and neardam
+      headwaters_cloudcover_temp <- reservoir_cloudcover_temp[1,]
+      neardam_cloudcover_temp <- reservoir_cloudcover_temp[2,]
+      #grab the NDs for this reservoir (non-detects)
+      reservoir_nondetects_temp <- as.matrix(ari_legit_nds[i:(i+1),3:ndays+2])
+      colnames(reservoir_nondetects_temp) <- NULL
+      #and separately extract for headwaters and neardam
+      headwaters_nondetects_temp <- reservoir_nondetects_temp[1,]
+      neardam_nondetects_temp <- reservoir_nondetects_temp[2,]
+      # QA: inspect temp objects
+      #View(rbind(headwaters_temp, headwaters_cloudcover_temp, headwaters_nondetects_temp))
+      #View(rbind(neardam_temp, neardam_cloudcover_temp, neardam_nondetects_temp))
+      
+      ##### handle NAs, NaNs and non-detects for this lake
+      #find those not NA/ND (and not zero) to begin with
       keepers_headwaters <- which(!is.na(headwaters_temp))
       keepers_neardam <- which(!is.na(neardam_temp))
-      #ID those where headwater OR neardam not NA
-      keepers_temp <- union(keepers_headwaters, keepers_neardam)
-      #extract the keepers
-      headwaters_kept <- headwaters_temp[keepers_temp]
-      neardam_kept <- neardam_temp[keepers_temp]
-      seasons_kept <- sample_season[keepers_temp]
-      #cbind(headwaters_kept, neardam_kept, seasons_kept)
+      #ID those where headwater OR neardam not NA with union
+      keepers_temp <- sort(union(keepers_headwaters, keepers_neardam))
+      print(paste("we now have", length(keepers_temp), "daily observations after dropping days with jointly missing values"))
+      
+      #####any remaining pair with a cloudcover observation should be dropped
+      # cloudcover observations are NAs in headwaters_cloudcover_temp or neardam_cloudcover_temp
+      headwaters_drop_cloudcover <- which(!is.nan(headwaters_cloudcover_temp[keepers_temp]))
+      keepers_temp[headwaters_drop_cloudcover] #tricky, tricky
+      neardam_drop_cloudcover <- which(!is.nan(neardam_cloudcover_temp[keepers_temp]))
+      keepers_temp[neardam_drop_cloudcover] #tricky, tricky
+      cloudcover_drop_these <- sort(union(headwaters_drop_cloudcover,neardam_drop_cloudcover))
+      cloudcover_drops <- keepers_temp[cloudcover_drop_these] # tricky, tricky
+      # remove cloudcover_drops from keepers_temp
+      keepers_temp2 <- keepers_temp[!(keepers_temp %in% cloudcover_drops)]
+      print(paste("we now have", length(keepers_temp2), "daily observations after dropping missing observations due to cloud cover"))
+
+      ##### drop any ties due to same value
       #find ties so we can drop them (for the test)
-      which_ties <- which(headwaters_kept==neardam_kept)
-      n_ties <- length(which_ties)
-      if(n_ties>0){
-        headwaters_kept <- headwaters_kept[-which_ties]
-        neardam_kept <- neardam_kept[-which_ties]
-        seasons_kept <- seasons_kept[-which_ties]
-      }
-      #identify season row ids
+      #View(rbind(headwaters_temp, neardam_temp))
+      which_detected_ties <- which(headwaters_temp[keepers_temp2]==neardam_temp[keepers_temp2])
+      n_detected_ties <- length(which_detected_ties)
+      keepers_temp3 <- keepers_temp2[-which_detected_ties]
+      #headwaters_temp[keepers_temp3]
+      #neardam_temp[keepers_temp3]
+      headwaters_temp3 <- headwaters_temp[keepers_temp3]
+      neardam_temp3 <- neardam_temp[keepers_temp3]
+      #which(headwaters_kept==neardam_kept)
+      #View(rbind(headwaters_kept, neardam_kept))
+      print(paste("we now have", length(keepers_temp3), "daily observations after dropping remaining ties"))
+      
+      ##### extract the keepers that will be used for testing
+      keepers_final <- keepers_temp3
+      headwaters_kept <- headwaters_temp[keepers_final]
+      neardam_kept <- neardam_temp[keepers_final]
+      seasons_kept <- sample_season[keepers_final]
+      dates_kept <- sample_date[keepers_final]
+      #cbind(headwaters_kept, neardam_kept, seasons_kept, dates_kept)
+
+      ##### only now change the remaining NAs to a non-detect proxy
+      headwaters_kept <- headwaters_kept %>% replace_na(nd_proxy)
+      neardam_kept <- neardam_kept %>% replace_na(nd_proxy)
+      #cbind(headwaters_kept, neardam_kept, seasons_kept, dates_kept)
+      
+      ##### identify season row ids
       season_which_spring <- which(seasons_kept=='spring')
       season_which_summer <- which(seasons_kept=='summer')
       season_which_fall <- which(seasons_kept=='fall')
       season_which_winter <- which(seasons_kept=='winter')
-      #now change the remaining NAs to a non-detect proxy
-      headwaters_kept <- headwaters_kept %>% replace_na(nd_proxy)
-      neardam_kept <- neardam_kept %>% replace_na(nd_proxy)
-      #View(cbind(headwaters_kept, neardam_kept))
-
+      
       ####
       #build a dataframe for the entire time series
       n_length <- length(headwaters_kept)

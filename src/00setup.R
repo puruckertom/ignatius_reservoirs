@@ -69,7 +69,7 @@ ari_legit_nds <- read.csv(file.path(ari_data_in,"/legit_nds_by_lake.csv"), strin
 dim(ari_legit_nds)
 summary(ari_legit_nds)
 colnames(ari_legit_nds)
-View(ari_legit_nds) #actual NDs are zero in this file, the rest are either detected or NA
+#View(ari_legit_nds) #actual NDs are zero in this file, the rest are either detected or NA
 
 #import cloud cover NAs from Amber and reassign as NAs to drop later for testing
 #these will be used inside loop later
@@ -79,7 +79,7 @@ ari_legit_NAs <- read.csv(file.path(ari_data_in,"/legit_NAs_by_lake.csv"), strin
 dim(ari_legit_NAs)
 summary(ari_legit_NAs)
 colnames(ari_legit_NAs)
-View(ari_legit_NAs)
+#View(ari_legit_NAs)
 ari_legit_NAs[56,13] #NA
 ari_legit_NAs[56,14] #NaN
 
