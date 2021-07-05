@@ -73,6 +73,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
       #ID those where headwater OR neardam not NA with union
       keepers_temp <- sort(union(keepers_headwaters, keepers_neardam))
       print(paste("we now have", length(keepers_temp), "daily observations after dropping days with jointly missing values"))
+      #View(rbind(headwaters_temp[keepers_temp], neardam_temp[keepers_temp]))
       
       #####any remaining pair with a cloudcover observation should be dropped
       # cloudcover observations are NAs in headwaters_cloudcover_temp or neardam_cloudcover_temp
@@ -85,13 +86,18 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
       # remove cloudcover_drops from keepers_temp
       keepers_temp2 <- keepers_temp[!(keepers_temp %in% cloudcover_drops)]
       print(paste("we now have", length(keepers_temp2), "daily observations after dropping missing observations due to cloud cover"))
-
+      #View(rbind(headwaters_temp[keepers_temp2], neardam_temp[keepers_temp2]))
+      
       ##### drop any ties due to same value
       #find ties so we can drop them (for the test)
       #View(rbind(headwaters_temp, neardam_temp))
       which_detected_ties <- which(headwaters_temp[keepers_temp2]==neardam_temp[keepers_temp2])
       n_detected_ties <- length(which_detected_ties)
-      keepers_temp3 <- keepers_temp2[-which_detected_ties]
+      if(n_detected_ties>0){
+          keepers_temp3 <- keepers_temp2[-which_detected_ties]
+        } else {
+          keepers_temp3 <- keepers_temp2
+      }
       #headwaters_temp[keepers_temp3]
       #neardam_temp[keepers_temp3]
       headwaters_temp3 <- headwaters_temp[keepers_temp3]
