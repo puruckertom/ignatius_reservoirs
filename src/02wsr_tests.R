@@ -1,6 +1,6 @@
 dim(ari50)
 
-nd_proxy <- min(ari50[3:ndays+2], na.rm=T)
+nd_proxy <- min(ari50[3:ndays+2], na.rm=T)/sqrt(2)
 
 ndays <- ncol(ari50)-2
 col_strings <- colnames(ari50[3:ndays+2])
