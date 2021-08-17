@@ -42,7 +42,7 @@ for(i in 1:nrow(ari50)){
 cbind(headwaters, neardam)
 summary(headwaters)
 summary(neardam)
-hist(headwaters/neardam)
+hist(headwaters/neardam, breaks=100)
 summary(headwaters/neardam)
 hist(season)
 unique(season)
@@ -75,82 +75,83 @@ raincloud_theme <- theme(
 # spring
 n_hw_spring <- sum(!is.na(headwaters[spring_which]))
 n_nd_spring <- sum(!is.na(neardam[spring_which]))
-#thin by a factor of 4
-hw_spring_display <- headwaters[sample(spring_which, round(n_hw_spring/4), replace=FALSE)]
-nd_spring_display <- neardam[sample(spring_which, round(n_nd_spring/4), replace=FALSE)]
+#
 spring_df_1x1 <- data_1x1(
-  array_1 = headwaters[hw_spring_display],
-  array_2 = neardam[nd_spring_display],
-  jit_distance = 0,
+  array_1 = headwaters[spring_which],
+  array_2 = neardam[spring_which],
+  jit_distance = 0.09, # 0.2 is max allowed
   jit_seed = 321)
 spring_raincloud_1_h <- raincloud_1x1(
-  data = df_1x1, 
-  colors = (c('#0B8AAD','#21731B')), 
-  fills = (c('#0B8AAD','#21731B')), 
-  size = 0.0001, 
-  alpha = 0.04, 
+  data = spring_df_1x1, 
+  colors = (c('goldenrod1','lightskyblue2')), 
+  fills = (c('darkorange', 'dodgerblue')), 
+  size = 0.3, 
+  alpha = 0.8, 
   ort = 'h') +
   scale_x_continuous(breaks=c(1.3,2.3), 
                      labels=c(paste("Headwaters\n n=",n_hw_spring), paste("Near Dam\n n=",n_nd_spring)), 
                      limits=c(0.9, 3)) +
-  scale_y_continuous(breaks = NULL) +
+  scale_y_continuous(labels=c("","","","",""),
+                     limits=c(5000,400000)) +
   xlab("") + 
   ylab("") +
   theme_classic() +
   #raincloud_theme +
   annotate(geom='text', x=3.0, y=0.05, label="Spring", fontface="bold")
+  #raincloud_theme
 spring_raincloud_1_h
 
 # summer
 n_hw_summer <- sum(!is.na(headwaters[summer_which]))
 n_nd_summer <- sum(!is.na(neardam[summer_which]))
-#thin by a factor of 4
-hw_summer_display <- headwaters[sample(summer_which, round(n_hw_summer/4), replace=FALSE)]
-nd_summer_display <- neardam[sample(summer_which, round(n_nd_summer/4), replace=FALSE)]
+#
 summer_df_1x1 <- data_1x1(
-  array_1 = headwaters[hw_summer_display],
-  array_2 = neardam[nd_summer_display],
+  array_1 = headwaters[summer_which],
+  array_2 = neardam[summer_which],
   jit_distance = .09,
   jit_seed = 321)
+#View(summer_df_1x1)
 summer_raincloud_1_h <- raincloud_1x1(
-  data = df_1x1, 
-  colors = (c('#0B8AAD','#21731B')), 
-  fills = (c('#0B8AAD','#21731B')), 
-  size = 0.02, 
-  alpha = 0.04, 
+  data = summer_df_1x1, 
+  colors = (c('goldenrod1','lightskyblue2')), 
+  fills = (c('darkorange', 'dodgerblue')), 
+  size = 0.3, 
+  alpha = 0.8,  
   ort = 'h') +
   scale_x_continuous(breaks=c(1.3,2.3), 
-                     labels=c(paste("Headwaters\n n=",n_hw_summer), paste("Near Dam\n n=",n_nd_summer)),
+                     labels=c(paste("Headwaters\n n=",n_hw_summer), paste("Near Dam\n n=",n_nd_summer)), 
                      limits=c(0.9, 3)) +
-  scale_y_continuous(breaks = NULL) +
+  scale_y_continuous(labels=c("","","","",""),
+                     limits=c(5000,400000)) +
   xlab("") + 
   ylab("") +
   theme_classic() +
-  annotate(geom='text', x=3.0, y=0.05, label="Summer", fontface="bold")
+  #raincloud_theme +
+  annotate(geom='text', x=3.0, y=0.05, label="Spring", fontface="bold")
+  #raincloud_theme
 summer_raincloud_1_h
 
 # fall
 n_hw_fall <- sum(!is.na(headwaters[fall_which]))
 n_nd_fall <- sum(!is.na(neardam[fall_which]))
-#thin by a factor of 4
-hw_fall_display <- headwaters[sample(fall_which, round(n_hw_fall/4), replace=FALSE)]
-nd_fall_display <- neardam[sample(fall_which, round(n_nd_fall/4), replace=FALSE)]
+#
 fall_df_1x1 <- data_1x1(
-  array_1 = headwaters[hw_fall_display],
-  array_2 = neardam[nd_fall_display],
+  array_1 = headwaters[fall_which],
+  array_2 = neardam[fall_which],
   jit_distance = .09,
   jit_seed = 321)
 fall_raincloud_1_h <- raincloud_1x1(
-  data = df_1x1, 
-  colors = (c('#0B8AAD','#21731B')), 
-  fills = (c('#0B8AAD','#21731B')), 
-  size = 0.02, 
-  alpha = 0.04, 
+  data = fall_df_1x1, 
+  colors = (c('goldenrod1','lightskyblue2')), 
+  fills = (c('darkorange', 'dodgerblue')), 
+  size = 0.3, 
+  alpha = 0.8, 
   ort = 'h') +
   scale_x_continuous(breaks=c(1.3,2.3), 
                      labels=c(paste("Headwaters\n n=",n_hw_fall), paste("Near Dam\n n=",n_nd_fall)),
                      limits=c(0.9, 3)) +
-  scale_y_continuous(breaks = NULL) +
+  scale_y_continuous(labels=c("","","","",""),
+                     limits=c(5000,400000)) +
   xlab("") + 
   ylab("") +
   theme_classic() +
@@ -161,25 +162,25 @@ fall_raincloud_1_h
 n_hw_winter <- sum(!is.na(headwaters[winter_which]))
 n_nd_winter <- sum(!is.na(neardam[winter_which]))
 #thin by a factor of 4
-hw_winter_display <- headwaters[sample(winter_which, round(n_hw_winter/4), replace=FALSE)]
-nd_winter_display <- neardam[sample(winter_which, round(n_nd_winter/4), replace=FALSE)]
+hw_winter_display <- headwaters[winter_which]
+nd_winter_display <- neardam[winter_which]
 winter_df_1x1 <- data_1x1(
-  array_1 = headwaters[hw_winter_display],
-  array_2 = neardam[nd_winter_display],
+  array_1 = headwaters[winter_which],
+  array_2 = neardam[winter_which],
   jit_distance = .09,
   jit_seed = 321)
 winter_raincloud_1_h <- raincloud_1x1(
-  data = df_1x1, 
-  colors = (c('#0B8AAD','#21731B')), 
-  fills = (c('#0B8AAD','#21731B')), 
-  size = 0.02, 
-  alpha = 0.04, 
+  data = winter_df_1x1, 
+  colors = (c('goldenrod1','lightskyblue2')), 
+  fills = (c('darkorange', 'dodgerblue')), 
+  size = 0.3, 
+  alpha = 0.8,  
   ort = 'h') +
   scale_x_continuous(breaks=c(1.3,2.3), 
                      labels=c(paste("Headwaters\n n=",n_hw_winter), paste("Near Dam\n n=",n_nd_winter)),
                      limits=c(0.9, 3)) +
-  scale_y_continuous(breaks = NULL) +
-  xlab("") + 
+  scale_y_continuous(limits=c(5000,400000)) +
+  xlab("") +
   ylab("Cyanobacteria concentration (cells/ml)") +
   theme_classic() +
   annotate(geom='text', x=3.0, y=0.05, label="Winter", fontface="bold")
