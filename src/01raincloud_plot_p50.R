@@ -95,9 +95,10 @@ spring_raincloud_1_h <- raincloud_1x1(
                      limits=c(5000,400000)) +
   xlab("") + 
   ylab("") +
-  theme_classic() +
+  annotate(geom='text', x=3, y=60000, label="Spring", fontface="bold") +
+  theme_classic()
   #raincloud_theme +
-  annotate(geom='text', x=3.0, y=0.05, label="Spring", fontface="bold")
+  
   #raincloud_theme
 spring_raincloud_1_h
 
@@ -125,9 +126,10 @@ summer_raincloud_1_h <- raincloud_1x1(
                      limits=c(5000,400000)) +
   xlab("") + 
   ylab("") +
-  theme_classic() +
+  annotate(geom='text', x=3, y=60000, label="Summer", fontface="bold") +
+  theme_classic()
   #raincloud_theme +
-  annotate(geom='text', x=3.0, y=0.05, label="Spring", fontface="bold")
+  
   #raincloud_theme
 summer_raincloud_1_h
 
@@ -154,8 +156,9 @@ fall_raincloud_1_h <- raincloud_1x1(
                      limits=c(5000,400000)) +
   xlab("") + 
   ylab("") +
-  theme_classic() +
-  annotate(geom='text', x=3.0, y=0.05, label="Fall", fontface="bold")
+  annotate(geom='text', x=3, y=60000, label="Fall", fontface="bold") +
+  theme_classic()
+  
 fall_raincloud_1_h
 
 # winter
@@ -182,8 +185,9 @@ winter_raincloud_1_h <- raincloud_1x1(
   scale_y_continuous(limits=c(5000,400000)) +
   xlab("") +
   ylab("Cyanobacteria concentration (cells/ml)") +
-  theme_classic() +
-  annotate(geom='text', x=3.0, y=0.05, label="Winter", fontface="bold")
+  annotate(geom='text', x=3, y=60000, label="Winter", fontface="bold") +
+  theme_classic()
+  
 winter_raincloud_1_h
 
 ignatius_winter_jpg <- paste(ari_graphics,"/ari_winter.jpg",sep="")
@@ -213,4 +217,11 @@ jpeg(ignatius_all_season_jpg, width = 5, height = 8, units = "in",res=600)
 par(mfrow=c(1,1))
   ggarrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, winter_raincloud_1_h,
             ncol = 1, nrow = 4)
+dev.off()
+
+ignatius_all_season_tif <- paste(ari_graphics,"/ari_all_seasons_p50.tif",sep="")
+tiff(ignatius_all_season_tif, width = 5, height = 8, units = "in",res=600)
+par(mfrow=c(1,1))
+ggarrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, winter_raincloud_1_h,
+          ncol = 1, nrow = 4)
 dev.off()
