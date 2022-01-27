@@ -1,3 +1,9 @@
+# running wilcoxon signed rank tests
+# 1822 days
+# proxy values assigned to NA values (smallest observed divided by sqrt(2))
+
+
+#View(ari50)
 dim(ari50)
 
 nd_proxy <- min(ari50[3:ndays+2], na.rm=T)/sqrt(2)
@@ -27,6 +33,9 @@ pvalue_spring <- vector(mode="numeric", length=60)
 pvalue_summer <- vector(mode="numeric", length=60)
 pvalue_fall <- vector(mode="numeric", length=60)
 pvalue_winter <- vector(mode="numeric", length=60)
+reservoir_n1 <- vector(mode="numeric", length=60)
+reservoir_n2 <- vector(mode="numeric", length=60)
+reservoir_n3 <- vector(mode="numeric", length=60)
 # non-parameteric wilcoxon signed rank test for paired samples
 # https://www.datanovia.com/en/lessons/wilcoxon-test-in-r/#signed-rank-test-on-paired-samples
 
@@ -74,6 +83,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
       keepers_temp <- sort(union(keepers_headwaters, keepers_neardam))
       print(paste("we now have", length(keepers_temp), "daily observations after dropping days with jointly missing values"))
       #View(rbind(headwaters_temp[keepers_temp], neardam_temp[keepers_temp]))
+      reservoir_n1[counter] <- length(keepers_temp)
       
       #####any remaining pair with a cloudcover observation should be dropped
       # cloudcover observations are NAs in headwaters_cloudcover_temp or neardam_cloudcover_temp
@@ -87,6 +97,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
       keepers_temp2 <- keepers_temp[!(keepers_temp %in% cloudcover_drops)]
       print(paste("we now have", length(keepers_temp2), "daily observations after dropping missing observations due to cloud cover"))
       #View(rbind(headwaters_temp[keepers_temp2], neardam_temp[keepers_temp2]))
+      reservoir_n2[counter] <- length(keepers_temp2)
       
       ##### drop any ties due to same value
       #find ties so we can drop them (for the test)
@@ -105,6 +116,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
       #which(headwaters_kept==neardam_kept)
       #View(rbind(headwaters_kept, neardam_kept))
       print(paste("we now have", length(keepers_temp3), "daily observations after dropping remaining ties"))
+      reservoir_n3[counter] <- length(keepers_temp3)
       
       ##### extract the keepers that will be used for testing
       keepers_final <- keepers_temp3
@@ -172,7 +184,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
           location = rep(c("hw", "nd"), each = n_length_spring)))
       bloom_compare_spring$concentration <- as.numeric(bloom_compare_spring$concentration)
       bloom_compare_spring$location <- as.factor(bloom_compare_spring$location)
-      #summary(bloom_compare)
+      #summary(bloom_compare_spring)
       #wsr test for all
       hw_nd_test_spring <- wilcox.test(x=headwaters_kept_spring, y=neardam_kept_spring,
                                 alternative = "greater",
@@ -204,7 +216,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
           location = rep(c("hw", "nd"), each = n_length_summer)))
       bloom_compare_summer$concentration <- as.numeric(bloom_compare_summer$concentration)
       bloom_compare_summer$location <- as.factor(bloom_compare_summer$location)
-      #summary(bloom_compare)
+      #summary(bloom_compare_summer)
       #wsr test for all
       hw_nd_test_summer <- wilcox.test(x=headwaters_kept_summer, y=neardam_kept_summer,
                                        alternative = "greater",
@@ -236,7 +248,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
           location = rep(c("hw", "nd"), each = n_length_fall)))
       bloom_compare_fall$concentration <- as.numeric(bloom_compare_fall$concentration)
       bloom_compare_fall$location <- as.factor(bloom_compare_fall$location)
-      #summary(bloom_compare)
+      #summary(bloom_compare_fall)
       #wsr test for all
       hw_nd_test_fall <- wilcox.test(x=headwaters_kept_fall, y=neardam_kept_fall,
                                        alternative = "greater",
@@ -268,7 +280,7 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
           location = rep(c("hw", "nd"), each = n_length_winter)))
       bloom_compare_winter$concentration <- as.numeric(bloom_compare_winter$concentration)
       bloom_compare_winter$location <- as.factor(bloom_compare_winter$location)
-      #summary(bloom_compare)
+      #summary(bloom_compare_winter)
       #wsr test for all
       hw_nd_test_winter <- wilcox.test(x=headwaters_kept_winter, y=neardam_kept_winter,
                                        alternative = "greater",
@@ -305,7 +317,13 @@ pdf(ari_wsr_test_filename, width = 8.5, height = 11, onefile = T)
   }
 dev.off()
 
-location_pvalues <- cbind(location_sig, pvalue)
+dim(bloom_compare_all)
+
+location_pvalues <- cbind(location_sig, pvalue, reservoir_n1, reservoir_n2, reservoir_n3)
+sum(reservoir_n1)
+sum(reservoir_n2)
+sum(reservoir_n3)
+
 #View(location_pvalues)
 sum(pvalue>0.05)
 sum(pvalue_spring>0.05)

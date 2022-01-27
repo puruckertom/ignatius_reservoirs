@@ -1,3 +1,14 @@
+# printing raincloud plots of the entire distribution
+# all the data
+# total number of days = 1822
+# total number of lakes = 60
+# therefore 109320 observations potentially available at the headwater and neardam locations
+# we initially drop those where both headwater and neardam values are NA
+# then left with 35171 total observations 
+# at the headwater and at the near dam
+# observations are dropped when both are NA
+
+
 dim(ari50)
 
 ndays <- ncol(ari50)-2
@@ -42,6 +53,8 @@ for(i in 1:nrow(ari50)){
 cbind(headwaters, neardam)
 summary(headwaters)
 summary(neardam)
+length(headwaters)
+length(neardam)
 hist(headwaters/neardam, breaks=100)
 summary(headwaters/neardam)
 hist(season)
@@ -220,8 +233,8 @@ par(mfrow=c(1,1))
 dev.off()
 
 ignatius_all_season_tif <- paste(ari_graphics,"/ari_all_seasons_p50.tif",sep="")
-tiff(ignatius_all_season_tif, width = 5, height = 8, units = "in",res=600)
+tiff(ignatius_all_season_tif, width = 5, height = 8, units = "in", compression="jpeg", res=600)
 par(mfrow=c(1,1))
-ggarrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, winter_raincloud_1_h,
+  ggarrange(spring_raincloud_1_h, summer_raincloud_1_h, fall_raincloud_1_h, winter_raincloud_1_h,
           ncol = 1, nrow = 4)
 dev.off()
